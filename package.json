@@ -1,0 +1,137 @@
+{
+  "name": "vscode-test-generator",
+  "displayName": "vscode-test-generator",
+  "description": "Generate test files automatically based on the selected or opened file.",
+  "version": "0.0.1",
+  "publisher": "cn-cxs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cn-cxs/vscode-test-generator"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-test-generator.generateTest",
+        "title": "Generate Test File",
+        "category": "Testing"
+      },
+      {
+        "command": "vscode-test-generator.openConfig",
+        "title": "Generate Test File Configuration",
+        "category": "Testing"
+      }
+    ],
+    "configuration": {
+      "title": "Test File Generator",
+      "properties": {
+        "testFileGenerator.testFileExtension": {
+          "type": "string",
+          "default": "test.tsx",
+          "description": "Test file extension (e.g., test.tsx, spec.tsx)",
+          "enum": [
+            "test.tsx",
+            "spec.tsx",
+            "test.ts",
+            "spec.ts"
+          ]
+        },
+        "testFileGenerator.testFilePath": {
+          "type": "string",
+          "default": "__tests__",
+          "description": "Path for test files relative to source file"
+        },
+        "testFileGenerator.testTemplate": {
+          "type": "object",
+          "default": {
+            "importStatements": [
+              "import { render, screen } from '@testing-library/react';",
+              "import '@testing-library/jest-dom';",
+              "import ${componentName} from '${componentPath}';"
+            ],
+            "testDescription": "${componentName}",
+            "testCases": [
+              {
+                "title": "should render successfully",
+                "code": "render(<${componentName} />);\nexpect(screen).toBeTruthy();"
+              }
+            ]
+          },
+          "description": "Test template configuration",
+          "properties": {
+            "importStatements": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Import statements at the top of test file"
+            },
+            "testDescription": {
+              "type": "string",
+              "description": "Main test suite description"
+            },
+            "testCases": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Test case title"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Test case implementation"
+                  }
+                }
+              },
+              "description": "Test cases to include"
+            }
+          }
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "vscode-test-generator.generateTest",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t",
+        "when": "editorFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "cvp": "npm run compile && vsce package",
+    "install": "code --install-extension vscode-test-generator-0.0.1.vsix"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.96.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "^9.16.0",
+    "typescript": "^5.7.2",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
