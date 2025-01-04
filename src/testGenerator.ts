@@ -27,8 +27,10 @@ describe('\${componentName}', () => {
         const fileName = path.basename(sourceFile, path.extname(sourceFile));
         const componentName = this.getExportedComponentName(sourceFile);
 
+
+        
         // Create test directory if it doesn't exist
-        const testDir = path.join(sourceDir, testPath);
+        const testDir = this.getTestDir(sourceFile,testPath,extension);
         if (!fs.existsSync(testDir)) {
             fs.mkdirSync(testDir, { recursive: true });
         }
@@ -53,6 +55,24 @@ describe('\${componentName}', () => {
         await vscode.window.showTextDocument(testFileUri);
     }
 
+    private static getTestDir(sourceFilePath:string,testFilePathConfig:string,testFileExtension:string) :string{
+        const sourceFileDir = path.dirname(sourceFilePath);
+	const sourceFileName = path.basename(sourceFilePath);
+	const testFileName = sourceFileName.replace(/\.tsx?$/, `.${testFileExtension}`);
+
+	// 1. Resolve the path from testFilePathConfig
+	const resolvedPath = path.resolve(sourceFileDir, testFilePathConfig);
+
+	// 2. Insert '__tests__' directory in the appropriate location of sourceFileDir
+	const relativePath = path.relative(resolvedPath, sourceFileDir);
+	const insertIndex = resolvedPath.endsWith(path.basename(resolvedPath))
+		? resolvedPath.length - path.basename(resolvedPath).length
+		: resolvedPath.length;
+	const testFileDir = resolvedPath.slice(0, insertIndex) + '__tests__' +path.sep+ relativePath.split(path.sep).slice(1).join(path.sep);
+
+	// Construct the final test file path
+	return path.join(testFileDir, testFileName);
+    }
     private static getExportedComponentName(filePath: string): string {
         const source = fs.readFileSync(filePath, 'utf-8');
         const sourceFile = ts.createSourceFile(
