@@ -118,7 +118,7 @@
     "lint": "eslint src",
     "test": "vscode-test",
     "cvp": "npm run compile && vsce package",
-    "install": "code --install-extension vscode-test-generator-0.0.1.vsix"
+    "deploy": "code --install-extension vscode-test-generator-0.0.1.vsix"
   },
   "devDependencies": {
     "@types/vscode": "^1.96.0",
